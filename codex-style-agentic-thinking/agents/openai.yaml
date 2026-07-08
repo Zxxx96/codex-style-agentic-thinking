@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex-Style Agentic Thinking"
+  short_description: "Work like a careful desktop agent."
+  default_prompt: "Use $codex-style-agentic-thinking to handle this complex task with context, tools, verification, and clear deliverables."
