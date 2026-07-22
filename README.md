@@ -1,196 +1,233 @@
 # Codex-Style Agentic Thinking
 
-A portable skill that turns chatty AI agents into disciplined desktop collaborators.
+A portable execution protocol for AI agents working on complex desktop and workspace tasks.
 
-It helps agents work in a context-first, tool-aware, verification-driven, and artifact-oriented way.
+It helps an agent choose the lightest safe workflow, inspect relevant context, act within authorization, preserve user state, handle uncertainty, and verify results before claiming success.
 
 This is an independent community project. It is not affiliated with, endorsed by, or maintained by OpenAI.
 
-## What It Does
+## What This Project Is
 
-`codex-style-agentic-thinking` packages a visible agent workflow into a reusable skill. It does not expose hidden chain-of-thought or claim to reproduce private model internals. Instead, it gives an agent a practical operating discipline:
+`codex-style-agentic-thinking` transfers observable work habits, not private model reasoning. It gives an agent a reusable execution discipline for tasks where a good answer is not enough and the work must be grounded, performed, checked, and handed off clearly.
 
-- **Classify before acting**: identify the task type, risk, scope, and done condition.
-- **Gather evidence with tools**: read files, run commands, inspect sources, render outputs.
-- **Separate facts from assumptions**: label facts, inferences, assumptions, and unknowns.
-- **Verify before claiming done**: match every completion claim to evidence.
-- **Protect the user's workspace**: avoid unrelated edits and irreversible actions.
-- **Deliver inspectable artifacts**: provide files, drafts, checklists, evidence, and risks.
+The protocol is designed for:
 
-## Why It Exists
+- multi-step or ambiguous tasks
+- code changes and debugging
+- current research and uncertain decisions
+- document and media creation
+- desktop automation and external actions
+- work that must preserve an existing workspace
+- claims that require evidence before the agent can say `done`
 
-Many AI agents can answer. Fewer can work reliably.
+It deliberately stays out of simple factual answers, translation, formatting-only requests, and single safe commands unless risk or uncertainty makes the protocol useful.
 
-For real desktop tasks, the hard part is not sounding smart. The hard part is knowing when to inspect files, when to run tests, when to stop and ask, when to avoid touching user state, and when a claim like "done" is actually justified.
+## Three Execution Modes
 
-This skill turns those habits into a portable protocol.
+| Mode | Use when | Agent behavior |
+|---|---|---|
+| **Direct** | Simple, stable, read-only, low-risk | Answer or execute directly without ceremony |
+| **Standard** | Multi-step or reversible local work | Inspect context, act narrowly, run a targeted check |
+| **Guarded** | External, destructive, sensitive, expensive, or hard-to-reverse work | Resolve scope and authorization, protect data/state, define fallback, verify the risky path |
 
-## Cross-Agent Feedback
+The mode controls diligence, not answer length. A careful agent should still be concise.
 
-I tested the idea with several desktop-agent systems and used their feedback to refine the skill.
+## Core Behaviors
 
-### Qoder
+- **Ground before acting**: inspect the smallest useful set of files, sources, logs, screenshots, or app state.
+- **Separate intent from capability**: analysis does not silently become editing; preparation does not silently become publication.
+- **Distinguish evidence layers**: keep facts, inferences, assumptions, and unknowns separate.
+- **Treat unknowns deliberately**: verify, negotiate, monitor, or accept them as named risks.
+- **Protect user state**: preserve unrelated changes and avoid destructive cleanup.
+- **Change approach after failure**: capture the concrete result and revise the hypothesis before retrying.
+- **Degrade honestly**: when tools or permissions are unavailable, leave a draft or handoff and weaken the completion claim.
+- **Verify claims**: tie `fixed`, `passed`, `sent`, and `published` to observed evidence.
+- **Avoid process theater**: do not print a full workflow when a direct result is enough.
 
-Qoder's evaluation framed the skill as a "work discipline suit" for general agents: useful for raising the floor, but not a substitute for expertise. It rated the strongest mechanisms as self-refutation, evidence layering, quality gates, failure handling, and trust-boundary labels. Its main critique was that task routing and the example library should become more executable and evaluable.
+## V2 Improvements
 
-That feedback led to:
+The current version adds:
 
-- stronger `quality-gates.md`
-- clearer trust-boundary handling
-- tighter completion-claim rules
-- a more explicit path toward routing tables and eval cases
-
-### Trae
-
-Trae summarized the before/after behavior clearly:
-
-- without the skill, an agent may jump straight into action, rely on memory, skip verification, get blocked by one missing fact, or say "done" without explaining what changed
-- with the skill, an agent classifies the task, gathers enough context, separates facts from assumptions, does what can be done first, verifies with tools, protects user state, and reports what was verified
-
-That feedback shaped the README positioning and reinforced the core loop:
-
-```text
-classify -> ground in context -> split work -> plan lightly -> gather evidence -> preserve state -> verify -> self-refute -> deliver
-```
-
-### WorkBuddy
-
-WorkBuddy distilled the project into one sentence:
-
-> Make AI work like a reliable desktop collaborator, not just a chat bot.
-
-It highlighted six core capabilities:
-
-- classify before acting
-- gather evidence with tools
-- separate facts from guesses
-- verify before claiming completion
-- protect the workspace
-- deliver checkable outputs
-
-That feedback became the current top-level product framing.
+- narrower triggering and explicit non-trigger cases
+- Direct, Standard, and Guarded routing
+- read-only, local-mutation, and external-action authorization levels
+- task-specific references loaded only when needed
+- privacy, credential, prompt-injection, interruption, and resume rules
+- an adaptive Markdown/JSON worklog generator
+- a JSON worklog validator
+- a repository-level behavioral evaluation suite
+- critical-failure rules for fabricated success, secret exposure, unauthorized actions, and user-state loss
 
 ## Repository Structure
 
 ```text
-codex-style-agentic-thinking/
-├── SKILL.md
-├── agents/
-│   └── openai.yaml
-├── references/
-│   ├── task-patterns.md
-│   ├── verification.md
-│   ├── quality-gates.md
-│   └── examples.md
-└── scripts/
-    └── thinking_scaffold.py
+codex-style-agentic-thinking-repo/
+|-- README.md
+|-- CHANGELOG.md
+|-- LICENSE
+|-- .github/
+|   `-- workflows/
+|       `-- ci.yml
+|-- codex-style-agentic-thinking/
+|   |-- SKILL.md
+|   |-- agents/
+|   |   `-- openai.yaml
+|   |-- references/
+|   |   |-- task-patterns.md
+|   |   |-- code-and-debug.md
+|   |   |-- research-and-decisions.md
+|   |   |-- artifacts-and-external-actions.md
+|   |   |-- verification.md
+|   |   |-- quality-gates.md
+|   |   `-- examples.md
+|   `-- scripts/
+|       `-- thinking_scaffold.py
+|-- evals/
+|   |-- README.md
+|   |-- cases.json
+|   |-- rubric.md
+|   |-- run_eval.py
+|   |-- validate_cases.py
+|   `-- fixtures/
+|       `-- <case-id>/ (workspace files and evaluator setup notes)
+`-- tests/
+    `-- test_skill_v2.py
 ```
 
-## Files
-
-### `SKILL.md`
-
-The main skill entry point. It defines the core loop:
-
-1. Classify the task.
-2. Ground in context.
-3. Split work into `do now` and `needs info`.
-4. Plan at the right resolution.
-5. Use tools for evidence.
-6. Preserve user state.
-7. Iterate and verify.
-8. Self-refute important conclusions.
-9. Deliver concise, checkable results.
-
-### `references/task-patterns.md`
-
-Task-specific workflows for research, code changes, debugging, reviews, decisions, document work, creative work, automation, releases, and external actions.
-
-### `references/verification.md`
-
-A completion discipline for claims like "fixed", "done", "passed", or "ready". It includes a claim-strength ladder so agents do not say "done" when they only drafted, guessed, or partially checked.
-
-### `references/quality-gates.md`
-
-Safety gates for complex or risky work:
-
-- scope gate
-- evidence gate
-- mutation gate
-- verification gate
-- failure gate
-- handoff gate
-- budget and stop gate
-- trust boundary gate
-
-### `references/examples.md`
-
-Concrete examples showing expected observable behavior across common desktop-agent tasks, including debugging, code review, refactoring, research, CSV analysis, document creation, release preparation, external messages, log diagnosis, and high-uncertainty decisions.
-
-### `scripts/thinking_scaffold.py`
-
-A small helper that emits a structured Markdown scaffold for complex tasks.
-
-```bash
-python scripts/thinking_scaffold.py "decide whether to accept a job offer in 48 hours"
-```
-
-The scaffold includes task classification, context, evidence, unknown handling, quality gates, action plan, verification, and deliverables.
+The installable Skill remains lean. Evaluation files stay at repository level so normal Skill use does not load benchmark material into the agent context.
 
 ## Installation
 
-Copy the skill folder into your Codex skills directory:
+Clone the repository:
 
 ```bash
-~/.codex/skills/codex-style-agentic-thinking
+git clone https://github.com/Zxxx96/codex-style-agentic-thinking.git
 ```
 
-On Windows, this may be:
+Copy the inner `codex-style-agentic-thinking` folder into the Skill directory used by your agent host.
+
+For Codex on Windows, the destination is commonly:
 
 ```powershell
 C:\Users\<you>\.codex\skills\codex-style-agentic-thinking
 ```
 
-Then invoke it explicitly:
+Other desktop agents can use the protocol when they support a compatible Skill or instruction-folder mechanism. Their tool access, permission model, and instruction precedence still determine what the protocol can actually enforce.
+
+## Usage
+
+Invoke it explicitly for a complex task:
 
 ```text
-Use $codex-style-agentic-thinking to handle this complex task with context, tools, verification, and clear deliverables.
+Use $codex-style-agentic-thinking to inspect this repository, fix the failing login test without touching unrelated changes, and verify the result.
 ```
 
-## Example Prompt
+The Skill can also be combined with a domain-specific Skill. The domain Skill supplies specialized procedures; this protocol supplies scope control, evidence handling, authorization, state protection, failure recovery, and verification.
 
-```text
-Use $codex-style-agentic-thinking to review this repo, identify why the login test is flaky, fix it, and verify the result without changing unrelated files.
+## Adaptive Worklog
+
+Generate a debugging worklog:
+
+```bash
+python codex-style-agentic-thinking/scripts/thinking_scaffold.py \
+  --type debug --risk standard "fix the failing login test"
 ```
 
-Expected behavior:
+Generate JSON for a guarded decision:
 
-- inspect the repo before editing
-- reproduce or observe the failure
-- form a narrow hypothesis
-- patch the smallest cause
-- run the relevant test
-- report changed files and verification
-- avoid claiming success if verification fails
+```bash
+python codex-style-agentic-thinking/scripts/thinking_scaffold.py \
+  --type decision --risk guarded --format json \
+  --output worklog.json "choose between three vendors"
+```
 
-## Design Principles
+After filling the worklog, validate required evidence and completion fields:
 
-- **Evidence over assertion**: read, run, inspect, render, or cite.
-- **Smallest useful action**: avoid unnecessary scope and unrelated edits.
-- **State preservation**: treat the user's workspace as live and shared.
-- **Explicit uncertainty**: unknowns become verification, negotiation, monitoring, or accepted risk.
-- **Safe external actions**: draft before sending, publishing, merging, deleting, or paying.
-- **Right-sized process**: simple tasks get direct answers; complex tasks get structure.
+```bash
+python codex-style-agentic-thinking/scripts/thinking_scaffold.py \
+  --check worklog.json
+```
+
+## Evaluation
+
+The `evals/` directory turns the protocol into a testable project rather than a collection of good intentions.
+
+It currently covers:
+
+- simple tasks that should remain Direct
+- diagnosis without edit authority
+- code changes in a dirty worktree
+- current product research
+- high-uncertainty decisions
+- authorized publication
+- unavailable execution tools
+- prompt injection inside repository content
+- changed hypotheses after command failure
+- interrupted work and newest-request handling
+- visual verification of generated artifacts
+
+Run an evaluation case end to end:
+
+```bash
+# List cases and fixture availability
+python evals/run_eval.py list
+
+# Materialize a fixture and a run-record template
+python evals/run_eval.py prepare --case dirty-worktree-code-fix \
+  --workdir /tmp/run1 --condition skill
+
+# After the run, fill the record and score it
+python evals/run_eval.py score --record /tmp/run1.record.json
+
+# Aggregate baseline vs skill records
+python evals/run_eval.py summarize --records ./results
+```
+
+Validate the case library with:
+
+```bash
+python evals/validate_cases.py
+```
+
+Run the repository tests with:
+
+```bash
+python -B -m unittest discover -s tests -v
+```
+
+Both checks also run in CI (`.github/workflows/ci.yml`) on every push and pull request.
+
+For a fair comparison, run the same model and agent host with and without the Skill, keep tools and permissions constant, use fresh fixtures, save raw traces, and score at least three runs per condition. See `evals/README.md` and `evals/rubric.md`.
+
+## Cross-Agent Feedback
+
+Early feedback from Qoder, Trae, and WorkBuddy helped shape the protocol.
+
+### Qoder
+
+Qoder described the Skill as a useful work-discipline layer that can raise an agent's reliability floor without replacing model capability or domain expertise. Its main critique was that task routing and examples needed to become more executable and evaluable. V2 responds with explicit routing modes, a structured case library, and a scoring rubric.
+
+### Trae
+
+Trae highlighted the behavioral contrast between agents that jump straight into action and agents that first classify risk, gather context, separate facts from assumptions, protect state, and verify outcomes. That feedback reinforced the core execution loop and the rule against unsupported `done` claims.
+
+### WorkBuddy
+
+WorkBuddy summarized the value as turning a chatbot into a disciplined desktop collaborator. It emphasized evidence gathering, state protection, verification, and checkable delivery, which remain the project's central product framing.
+
+These are qualitative assessments, not controlled benchmark results. The reproducible evaluation protocol in `evals/` should be used for quantitative claims.
 
 ## Non-Goals
 
-This skill does not:
+This Skill does not:
 
 - expose hidden chain-of-thought
-- replace domain-specific skills
-- make a weak model as capable as a stronger model
-- guarantee correctness without verification
-- authorize irreversible actions on behalf of the user
+- make a weaker model equal to a stronger model
+- replace domain-specific expertise or tools
+- guarantee correctness without relevant evidence
+- create permissions the host agent does not have
+- authorize irreversible actions on the user's behalf
+- prove improvement from a single screenshot or one-off score
 
 ## License
 

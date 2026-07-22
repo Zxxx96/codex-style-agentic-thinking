@@ -1,0 +1,5 @@
+{
+  "theme": "dark",
+  "autosave_minutes": 5,
+  "recent_projects": ["~/projects/alpha", "~/projects/beta"]
+}
