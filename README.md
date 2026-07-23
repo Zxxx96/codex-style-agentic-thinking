@@ -1,10 +1,34 @@
 # Codex-Style Agentic Thinking
 
+English · [中文介绍](#中文介绍)
+
 A portable execution protocol for AI agents working on complex desktop and workspace tasks.
 
 It helps an agent choose the lightest safe workflow, inspect relevant context, act within authorization, preserve user state, handle uncertainty, and verify results before claiming success.
 
 This is an independent community project. It is not affiliated with, endorsed by, or maintained by OpenAI.
+
+## 中文介绍
+
+`codex-style-agentic-thinking` 是一套面向 AI Agent 的执行纪律协议。它不展示或复现模型的隐藏思维过程，而是规范可观察、可检查的工作方式：先确认目标和权限，再根据任务风险选择合适的执行强度，使用工具获取证据，保护用户的工作区，并在验证完成后才声明任务已经修复、发布或交付。
+
+它主要解决这几类问题：
+
+- Agent 面对复杂任务时过早行动，没有先检查上下文和影响范围；
+- 把事实、推断、假设和未知信息混在一起，导致结论看似确定却缺少证据；
+- 遇到失败后重复相同操作，而不是调整假设或验证方法；
+- 修改了无关文件、覆盖用户状态，或在未获授权时执行外部操作；
+- 只完成了草稿或局部检查，却声称任务已经完成。
+
+协议提供三种执行模式：`Direct` 用于简单、低风险的任务，`Standard` 用于需要多步处理的可逆工作，`Guarded` 用于发布、删除、凭据处理等高风险或外部操作。它适合代码修改与调试、资料研究、文档和媒体制作、桌面自动化，以及需要明确授权和验收证据的任务；简单问答、翻译或单条安全命令通常不需要启用。
+
+安装时，克隆本仓库并将其中的 `codex-style-agentic-thinking` 文件夹复制到 Agent 主机的 Skill 目录。Codex on Windows 通常使用：
+
+```powershell
+C:\Users\<你的用户名>\.codex\skills\codex-style-agentic-thinking
+```
+
+具体结构、使用示例和评测方法见下方英文说明。
 
 ## What This Project Is
 
